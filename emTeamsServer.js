@@ -4,6 +4,7 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const Joi = require("joi");
 require("express-async-errors");
+const cors = require("cors");
 
 // Model
 
@@ -32,6 +33,7 @@ function validateTeam(team) {
 
 // Routes
 
+app.use(cors());
 app.use(express.json());
 
 router.get("/", async (req, res) => {
@@ -71,11 +73,11 @@ router.put("/:id", async (req, res) => {
 });
 
 router.delete("/:id", async (req, res, next) => {
-    const team = await Team.findByIdAndDelete(req.params.id);
-    if (!team)
-      return res.status(404).send("The team with the given ID was not found.");
+  const team = await Team.findByIdAndDelete(req.params.id);
+  if (!team)
+    return res.status(404).send("The team with the given ID was not found.");
 
-    res.send(team);
+  res.send(team);
 });
 
 app.use("/teams", router);
