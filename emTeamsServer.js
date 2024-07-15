@@ -3,6 +3,7 @@ const app = express();
 const router = express.Router();
 const mongoose = require("mongoose");
 const Joi = require("joi");
+require("express-async-errors");
 
 // Model
 
@@ -34,9 +35,6 @@ function validateTeam(team) {
 app.use(express.json());
 
 router.get("/", async (req, res) => {
-  const { error } = validateTeam(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
-
   const teams = await Team.find().sort("name");
 
   res.send(teams);
@@ -72,15 +70,18 @@ router.put("/:id", async (req, res) => {
   res.send(team);
 });
 
-router.delete("/:id", async (req, res) => {
-  const { error } = validateTeam(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
+router.delete("/:id", async (req, res, next) => {
+    const team = await Team.findByIdAndDelete(req.params.id);
+    if (!team)
+      return res.status(404).send("The team with the given ID was not found.");
 
-  const team = await Team.findByIdAndRemove(req.params.id);
-  if (!team)
-    return res.status(404).send("The team with the given ID was not found.");
+    res.send(team);
+});
 
-  res.send(team);
+app.use("/teams", router);
+
+app.use((err, req, res, next) => {
+  res.status(err.code || 500).send({ error: err.message });
 });
 
 // Launch
@@ -89,4 +90,4 @@ mongoose
   .connect("mongodb://localhost/em-teams")
   .then(() => console.log(`Connected to DB`));
 
-app.listen(3000, () => console.log(`Listening on port 3000`));
+app.listen(3000, () => console.log("Listening on port http://localhost:3000"));

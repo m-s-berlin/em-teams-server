@@ -1,0 +1,20 @@
+get http://localhost:3000/teams
+
+###
+post http://localhost:3000/teams
+Content-Type: application/json 
+
+{
+    "name": "Schweizn"
+}
+
+###
+delete http://localhost:3000/teams/6694fbcba6b552211632b44a
+
+###
+put http://localhost:3000/teams/6694ff64aa8043574c8f4b21
+Content-Type: application/json
+
+{
+    "name": "Schweiz"
+}
